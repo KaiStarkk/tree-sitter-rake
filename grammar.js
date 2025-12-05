@@ -256,7 +256,20 @@ module.exports = grammar({
     _statement: $ => choice(
       $.let_statement,
       $.assign_statement,
+      $.over_statement,
       $.expression_statement
+    ),
+
+    // Over loop: iterate over pack in SIMD-width chunks
+    over_statement: $ => seq(
+      'over',
+      field('pack', $.expression),
+      ',',
+      field('count', $.scalar_expression),
+      '|>',
+      field('binding', $.identifier),
+      ':',
+      repeat($._statement)
     ),
 
     let_statement: $ => seq(
