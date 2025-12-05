@@ -182,6 +182,10 @@
           "named": true
         },
         {
+          "type": "over_statement",
+          "named": true
+        },
+        {
           "type": "parameter",
           "named": true
         }
@@ -422,6 +426,52 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "over_statement",
+    "named": true,
+    "fields": {
+      "binding": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      },
+      "count": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "scalar_expression",
+            "named": true
+          }
+        ]
+      },
+      "pack": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -796,6 +846,10 @@
         },
         {
           "type": "let_statement",
+          "named": true
+        },
+        {
+          "type": "over_statement",
           "named": true
         },
         {
@@ -1570,6 +1624,10 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "over",
     "named": false
   },
   {

@@ -261,7 +261,8 @@ module.exports = grammar({
     ),
 
     // Over loop: iterate over pack in SIMD-width chunks
-    over_statement: $ => seq(
+    // Body is a single expression (use let-in for multiple bindings)
+    over_statement: $ => prec.right(seq(
       'over',
       field('pack', $.expression),
       ',',
@@ -269,8 +270,8 @@ module.exports = grammar({
       '|>',
       field('binding', $.identifier),
       ':',
-      repeat($._statement)
-    ),
+      field('body', $.expression)
+    )),
 
     let_statement: $ => seq(
       'let',

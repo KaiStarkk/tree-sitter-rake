@@ -1,10 +1,14 @@
 ; Rake 0.2.0 Syntax Highlighting
-; Tree-sitter highlight queries
+; Tree-sitter highlight queries for Neovim
 
-; Comments
+; ============================================================================
+; Comments - must be first to override other matches
+; ============================================================================
 (comment) @comment
 
+; ============================================================================
 ; Keywords
+; ============================================================================
 [
   "stack"
   "single"
@@ -15,40 +19,119 @@
   "let"
   "fun"
   "in"
-  "through"
-  "sweep"
-  "else"
 ] @keyword
 
-; lanes is a named rule, highlight it specially
-(lanes) @constant.builtin
-
-; Control flow
+; Control flow keywords get distinct color
 [
   "through"
   "sweep"
+  "over"
   "else"
-] @keyword.control
+] @keyword.conditional
 
+; ============================================================================
+; Tines - Rake's distinctive lane masks (#name)
+; Using @tag for distinctive color in most themes
+; ============================================================================
+; The # and identifier together form the tine
+(tine_ref
+  "#" @tag
+  (identifier) @tag)
+
+; Tine declarations: | #name :=
+(tine_decl
+  "|" @punctuation.special)
+
+; ============================================================================
+; Scalars - broadcast values in angle brackets <...>
+; Using @constant for distinctive color
+; ============================================================================
+(scalar_expression
+  "<" @punctuation.special) @constant
+(scalar_expression
+  ">" @punctuation.special)
+
+; Inside scalars, identifiers are constants
+(scalar_inner
+  (identifier) @constant)
+(scalar_inner
+  "." @punctuation.delimiter)
+(scalar_inner
+  (integer_literal) @number)
+(scalar_inner
+  (float_literal) @number.float)
+
+; ============================================================================
+; Function definitions - name should stand out
+; ============================================================================
+(crunch_def
+  name: (identifier) @function)
+(rake_def
+  name: (identifier) @function)
+(run_def
+  name: (identifier) @function)
+
+; Function calls
+(call_expression
+  function: (identifier) @function.call)
+
+; ============================================================================
+; Type definitions
+; ============================================================================
+(stack_def
+  name: (type_identifier) @type.definition)
+(single_def
+  name: (type_identifier) @type.definition)
+(type_def
+  name: (type_identifier) @type.definition)
+
+; ============================================================================
+; Types
+; ============================================================================
+(primitive_type) @type.builtin
+(compound_type) @type.builtin
+(mask_type) @type.builtin
+(type_identifier) @type
+
+; Collection types after type name
+[
+  "rack"
+  "pack"
+] @type.builtin
+
+; ============================================================================
 ; Operators
+; ============================================================================
+; Arrow operators
 [
   "->"
   "<-"
-  ":="
-  "|>"
+] @keyword.operator
+
+; Assignment
+":=" @keyword.operator
+
+; Pipe operator
+"|>" @keyword.operator
+
+; Shuffle/cross
+[
   "~>"
   "><"
-  "+"
-  "-"
-  "*"
-  "/"
-  "%"
+] @operator
+
+; Comparison
+[
   "<"
   "<="
   ">"
   ">="
   "="
   "!="
+] @operator
+
+; Logical
+[
   "!"
   "&&"
   "||"
@@ -56,66 +139,67 @@
   "or"
   "not"
   "is"
+] @keyword.operator
+
+; Arithmetic
+[
+  "+"
+  "-"
+  "*"
+  "/"
+  "%"
 ] @operator
 
-; Reduction/scan operators (distinctive styling)
-(reduce_op) @operator.special
-(scan_op) @operator.special
+; Reduction/scan operators
+(reduce_op) @keyword.operator
+(scan_op) @keyword.operator
 
-; Types
-(primitive_type) @type.builtin
-(compound_type) @type.builtin
-(mask_type) @type.builtin
-(type_identifier) @type
-
-; Tines - the distinctive Rake feature
-(tine_ref) @variable.parameter.tine
-(tine_decl
-  (tine_ref) @variable.definition.tine)
-
-; Scalars/broadcasts - angle bracket syntax <...>
-(scalar_expression) @variable.scalar
-
-; Functions
-(crunch_def
-  name: (identifier) @function.definition)
-(rake_def
-  name: (identifier) @function.definition)
-(run_def
-  name: (identifier) @function.definition)
-(call_expression
-  function: (identifier) @function.call)
+; ============================================================================
+; Variables
+; ============================================================================
+; Variable definitions in let
+(let_statement
+  name: (identifier) @variable)
 
 ; Parameters
 (rack_param
   (identifier) @variable.parameter)
-(scalar_param
-  (scalar_expression) @variable.parameter.scalar)
 
-; Fields
+; Result bindings
+(through_block
+  binding: (identifier) @variable)
+(sweep_block
+  binding: (identifier) @variable)
+(result_spec
+  (identifier) @variable)
+
+; General identifiers (lowest priority)
+(identifier) @variable
+
+; ============================================================================
+; Fields/Properties
+; ============================================================================
 (field_def
   name: (identifier) @property)
 (field_expression
+  . (_)
+  "."
   (identifier) @property)
 (field_init
   (identifier) @property)
 
-; Variables
-(let_statement
-  name: (identifier) @variable.definition)
-(assign_statement
-  (identifier) @variable)
-(identifier) @variable
-
+; ============================================================================
 ; Literals
+; ============================================================================
 (integer_literal) @number
 (float_literal) @number.float
-(boolean_literal) @constant.builtin.boolean
-
-; Special
+(boolean_literal) @boolean
+(lanes) @constant.builtin
 (lane_index) @constant.builtin
 
+; ============================================================================
 ; Punctuation
+; ============================================================================
 [
   "("
   ")"
@@ -127,10 +211,16 @@
 
 [
   ","
-  ":"
-  "|"
 ] @punctuation.delimiter
 
+; Type annotation colon
+":" @punctuation.delimiter
+
+; Tine/sweep pipe
+"|" @punctuation.special
+
+; ============================================================================
 ; Records
+; ============================================================================
 (record_expression
-  (type_identifier) @type.constructor)
+  (type_identifier) @type)
