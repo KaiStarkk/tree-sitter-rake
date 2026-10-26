@@ -12,11 +12,11 @@
   ],
   "metadata": {
     "version": "0.2.0",
-    "license": "MIT",
+    "license": "LicenseRef-MIT-SLOP",
     "description": "Tree-sitter grammar for Rake, a vector-first language for CPU SIMD",
     "authors": [
       {
-        "name": "Kieran Rosenberg"
+        "name": "Kieran Hannigan"
       }
     ],
     "links": {
